@@ -1,0 +1,18 @@
+{
+  "name": "taskbot",
+  "version": "0.0.0",
+  "description": "Perform tasks based on text from a given stream (hope to include email, twitter, and maybe even IM like jabber/irc/slack)",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha ./test",
+    "lint": "eslint --cache **/*.js; exit 0"
+  },
+  "author": "Rhett Lowe <rng2ml@gmail.com>",
+  "repository": "http://github.com/rhettl/taskbot",
+  "license": "ISC",
+  "devDependencies": {
+    "assert": "^1.3.0",
+    "eslint": "^1.10.3",
+    "mocha": "^2.3.4"
+  }
+}
