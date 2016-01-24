@@ -17,6 +17,7 @@ express/connect style functions.
     - [ ] messages as buffers
   - commands
     - [ ] \# as inline command
+    - [ ] consider adding parsing via commander (somehow)
     - [ ] can accept list (considering similar to yaml list)
     - [ ] get sent through different parsers based on command name or regex
       - analogous with express routes
