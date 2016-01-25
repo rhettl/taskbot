@@ -8,6 +8,15 @@ that command should be run through an array of parsers. Commands should be extra
 Commands/Parsers should be run sequentially so the message body may be modified in the process -- similar to 
 express/connect style functions.
 
+# Install
+
+```
+npm install taskbot
+```
+
+
+
+
 ## Initial Spec
 
 - taskbot:
