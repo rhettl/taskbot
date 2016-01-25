@@ -4,151 +4,133 @@
 'use strict';
 
 var assert = require('assert');
-var path   = require('path');
-var fs     = require('fs');
-var q      = require('q');
+//var path   = require('path');
+//var fs     = require('fs');
+//var q      = require('q');
 
-var Message      = require('../lib/message');
-var testFile     = './message.txt';
-var testFilePath = path.normalize(path.join(__dirname, testFile));
-var testMessage  = fs.readFileSync(testFilePath).toString();
+var Registry = require('../lib/command-registry');
+//var Message      = require('../lib/message');
+//var testFile     = './message.txt';
+//var testFilePath = path.normalize(path.join(__dirname, testFile));
+//var testMessage  = fs.readFileSync(testFilePath).toString();
 
-describe('Message', function () {
+describe('CommandRegistry', function () {
 
-  describe('Message', function () {
-    it('Message() == new Message()', function () {
-      var m1 = Message('message');
-      var m2 = new Message('message');
+  describe('Registry', function () {
+    it('Registry() == new Registry()', function () {
+      assert.deepEqual(Registry(), new Registry());
+    });
 
-      // don't need promises to equal.
-      delete m1.promise;
-      delete m2.promise;
-
-      assert.deepEqual(m1, m2);
+    it('initializes an empty registry at Registry._reg', function () {
+      assert.deepEqual({}, Registry()._reg);
     });
   });
 
-  describe('#_separateCommands', function () {
-
-    var mockup;
-    beforeEach(function () {
-      //noinspection JSAccessibilityCheck
-      mockup = {
-        body             : testMessage,
-        raw              : testMessage,
-        commands         : [],
-        _separateCommands: Message.prototype._separateCommands,
-        addCommand       : Message.prototype.addCommand
-      };
+  describe('#register', function () {
+    var reg;
+    beforeEach(function(){
+      reg = Registry();
     });
 
-    /**
-     * @rhettl: I feel like this test is weak. I would love a more solid way of checking this.
-     */
-    it('should remove all commands from message body', function () {
-      mockup._separateCommands();
-      assert.equal(
-        mockup.raw
-          // break by line
-          .split(/[\r\n]+/g)
-          // get rid of commands
-          .map(function (i) {
-            return i.replace(/(^\s*#.+[\r\n]*)/g, '');
-          })
-          //filter empty lines
-          .filter(function (i) {
-            return i.length;
-          })
-          // join by new line
-          .join('\n')
-          // trim trailing/leading lines
-          .trim(),
-        mockup.body.trim()
-      );
+    it('names a registry set if not existed', function () {
+      assert(!reg._reg['unnamed']);
+
+      reg.register('unnamed', function noop () {
+        return 1;
+      });
+      assert(reg._reg['unnamed']);
     });
 
-    it('should populate #commands', function () {
-      // has no commands
-      assert.equal(0, mockup.commands.length);
+    it('should take multiple functions as arguments', function () {
+      assert(!reg._reg['unnamed']);
 
-      // do separate
-      mockup._separateCommands();
-
-      // check number commands there should be
-      var numCommand = mockup.raw
-        .split(/[\r\n]+/g)
-        .filter(function (i) {
-          return /(^\s*#.+[\r\n]*)/g.test(i);
-        })
-        .length;
-
-      // check separate made correct number of commands
-      assert.equal(mockup.commands.length, numCommand);
+      reg.register('unnamed',
+        function noop1 () {
+          return 1;
+        }, function noop2 () {
+          return 2;
+        });
+      assert.equal(2, reg._reg['unnamed'].length);
     });
 
-  });
+    it('should concatenate new functions in order', function () {
+      assert(!reg._reg['unnamed']);
 
-  describe('#inspect\\#toString', function () {
-    it('should produce a string', function () {
-      var msg = Message(testMessage);
-      assert.equal('string', typeof msg.inspect());
-      assert.equal('string', typeof msg.toString());
+      reg.register('unnamed', function noop () {
+        return 0;
+      });
+
+      reg.register('unnamed',
+        function noop1 () {
+          return 1;
+        }, function noop2 () {
+          return 2;
+        });
+
+      assert.equal(3, reg._reg['unnamed'].length);
+
+      // Added in order
+      assert.equal(0, reg._reg['unnamed'][0]());
+      assert.equal(2, reg._reg['unnamed'][2]());
+    });
+
+    it('should store registry names case insensitive (lower case)', function () {
+      assert(!reg._reg['unnamed']);
+
+      reg.register('uNnAmEd', function noop () {
+        return 0;
+      });
+
+      assert(reg._reg['unnamed']);
+      assert(!reg._reg['uNnAmEd']);
     });
   });
 
-  describe('#addCommand', function () {
-    it('should add command to the Message.commands stack', function () {
-      var msg = Message('');
-      assert.equal(0, msg.commands.length);
-
-      msg.addCommand('test 123');
-      assert.equal(1, msg.commands.length);
-
-      msg.addCommand('log');
-      assert.equal(2, msg.commands.length);
-    });
-    it('should add same command with or without # char', function () {
-      var msg = Message('');
-      assert.equal(0, msg.commands.length);
-
-      msg.addCommand('log');
-      assert.equal(1, msg.commands.length);
-
-      msg.addCommand('#log');
-      assert.equal(2, msg.commands.length);
-
-      // raw will inherently be different, don't check it
-      assert.equal(msg.commands[0].name, msg.commands[1].name);
-      assert.deepEqual(msg.commands[0].args, msg.commands[1].args);
-    });
-  });
-
-  describe('#_bufferMessageStream', function () {
-    /**
-     * Todo: more complete testing here
-     * I feel this testing is lacking greatly
-     */
-
-    it('should return an empty Message immediately', function () {
-      //noinspection JSAccessibilityCheck
-      assert.equal('', Message._bufferMessageStream(fs.createReadStream(testFilePath)).body);
-    });
-    it('should create a promise at Message.promise', function () {
-      //noinspection JSAccessibilityCheck
-      assert(q.isPromise(Message._bufferMessageStream(fs.createReadStream(testFilePath)).promise));
-    });
-    it('should replace empty message with content after done buffering', function (done) {
-      //noinspection JSAccessibilityCheck
-      var msg = Message._bufferMessageStream(fs.createReadStream(testFilePath));
-
-      assert.equal('', msg.body);
-      msg.promise.done(function(){
-        assert.notEqual('', msg.body);
-        done();
+  describe('#has', function () {
+    var reg;
+    beforeEach(function(){
+      reg = Registry();
+      reg.register('named', function noop () {
+        return 1;
       });
     });
+
+    it('produces boolean values', function () {
+      assert.strictEqual(true, reg.has('named'));
+      assert.strictEqual(false, reg.has('unnamed'));
+    });
   });
 
+  describe('#call', function () {
+    it('t', function () {
+      assert(true);
+    });
+  });
 
+  describe('#command', function () {
+    var reg;
+    beforeEach(function(){
+      reg = Registry();
+      reg.register('named', function noop () {
+        return 1;
+      });
+    });
+
+    it('gets empty array of no registered functions', function () {
+      assert(!reg.has('unnamed'));
+      assert.deepEqual([], reg.command('unnamed'));
+    });
+
+    it('gets array of registered functions when they are present', function () {
+      assert(reg.has('named'));
+      assert.equal(1, reg.command('named').length);
+    });
+
+    it('is case insensitive', function () {
+      assert(reg.has('named'));
+      assert.equal(1, reg.command('named').length);
+      assert.equal(1, reg.command('nAmEd').length);
+    });
+  });
 
 });

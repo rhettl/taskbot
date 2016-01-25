@@ -8,14 +8,26 @@ var path   = require('path');
 var fs     = require('fs');
 var q      = require('q');
 
-var Message      = require('../lib/message');
-var testFile     = './message.txt';
-var testFilePath = path.normalize(path.join(__dirname, testFile));
-var testMessage  = fs.readFileSync(testFilePath).toString();
+var Message           = require('../lib/message');
+var testFile          = './message.txt';
+var testFilePath      = path.normalize(path.join(__dirname, testFile));
+var testMessageBuffer = fs.readFileSync(testFilePath);
+var testMessageString = testMessageBuffer.toString();
 
 describe('Message', function () {
 
   describe('Message', function () {
+
+    function cleanBody (txt) {
+      return txt
+        .split(/[\r\n]+/g)
+        .map(function (i) {
+          return i.replace(/(^\s*#.+)/, '');
+        })
+        .join('\n')
+        .trim();
+    }
+
     it('Message() == new Message()', function () {
       var m1 = Message('message');
       var m2 = new Message('message');
@@ -26,6 +38,51 @@ describe('Message', function () {
 
       assert.deepEqual(m1, m2);
     });
+
+    it('should accept String type argument', function () {
+      assert.equal(
+        cleanBody(testMessageString),
+        Message(testMessageString).body.trim()
+      );
+    });
+
+    it('should accept Buffer type argument', function () {
+      assert.equal(
+        cleanBody(testMessageString),
+        Message(testMessageBuffer).body.trim()
+      );
+    });
+
+    it('should accept Stream type argument', function (done) {
+      var msg = Message(fs.createReadStream(testFilePath));
+      msg.promise.done(function () {
+        assert.equal(
+          cleanBody(testMessageString),
+          msg.body.trim()
+        );
+        done();
+      });
+    });
+
+    it('should parse String, Buffer, and Stream the same', function (done) {
+      var m1 = Message(testMessageString);
+      var m2 = Message(testMessageBuffer);
+      var m3 = Message(fs.createReadStream(testFilePath));
+
+      assert.equal(m1.body, m2.body);
+      assert.deepEqual(m1.commands, m2.commands);
+
+      m3.promise.done(function () {
+        assert.equal(m1.body, m3.body);
+        assert.deepEqual(m1.commands, m3.commands);
+        done();
+      });
+    });
+
+    it('should allow promising from non-Stream inputs', function () {
+      assert(q.isPromise(Message(testMessageString).promise));
+      assert(q.isPromise(Message(testMessageBuffer).promise));
+    });
   });
 
   describe('#_separateCommands', function () {
@@ -34,8 +91,8 @@ describe('Message', function () {
     beforeEach(function () {
       //noinspection JSAccessibilityCheck
       mockup = {
-        body             : testMessage,
-        raw              : testMessage,
+        body             : testMessageString,
+        raw              : testMessageString,
         commands         : [],
         _separateCommands: Message.prototype._separateCommands,
         addCommand       : Message.prototype.addCommand
@@ -90,7 +147,7 @@ describe('Message', function () {
 
   describe('#inspect\\#toString', function () {
     it('should produce a string', function () {
-      var msg = Message(testMessage);
+      var msg = Message(testMessageString);
       assert.equal('string', typeof msg.inspect());
       assert.equal('string', typeof msg.toString());
     });
@@ -142,7 +199,7 @@ describe('Message', function () {
       var msg = Message._bufferMessageStream(fs.createReadStream(testFilePath));
 
       assert.equal('', msg.body);
-      msg.promise.done(function(){
+      msg.promise.done(function () {
         assert.notEqual('', msg.body);
         done();
       });
