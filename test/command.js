@@ -16,7 +16,7 @@ describe('Command', function () {
     });
 
     it('maintains raw version of original text in command.raw', function () {
-      assert.equal(Command('#command').raw, '#command');
+      assert.equal('#command', Command('#command').raw);
     });
 
     it('trims command before processing', function () {
@@ -27,11 +27,11 @@ describe('Command', function () {
     });
 
     it('First argument is command.name', function () {
-      assert.equal(Command('#command').name, 'command');
+      assert.equal('command', Command('#command').name);
     });
 
     it('rest arguments is command.args', function () {
-      assert.deepEqual(Command('#this is a command').args, ['is', 'a', 'command']);
+      assert.deepEqual(['is', 'a', 'command'], Command('#this is a command').args);
     });
 
     it('command.args is array', function () {
@@ -39,7 +39,7 @@ describe('Command', function () {
     });
 
     it('command.args is empty array if only command name given', function () {
-      assert.equal(Command('#command').args.length, 0);
+      assert.equal(0, Command('#command').args.length);
     });
 
     it('doesn\'t require # to make a command', function () {
@@ -54,11 +54,11 @@ describe('Command', function () {
   describe('#isCommand', function () {
 
     it('should recognize a command by preceding #', function () {
-      assert.equal(Command.isCommand('#command'), true);
+      assert.equal(true, Command.isCommand('#command'));
     });
 
     it('should not recognize a command without preceding #', function () {
-      assert.equal(Command.isCommand('now a command'), false);
+      assert.equal(false, Command.isCommand('now a command'));
     });
 
   });
@@ -66,12 +66,12 @@ describe('Command', function () {
   describe('#toString', function () {
 
     it('should produce a string', function () {
-      assert(Command('#command arg1 arg2').toString(), 'string');
+      assert('string', Command('#command arg1 arg2').toString());
     });
 
     it('is not formatted like original command text', function () {
       var cmd = '#command arg1 arg2';
-      assert.notEqual(Command(cmd).toString(), cmd);
+      assert.notEqual(cmd, Command(cmd).toString());
     });
 
   });
