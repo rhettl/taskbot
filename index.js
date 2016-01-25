@@ -7,6 +7,7 @@ var Command = require('./lib/command');
 var Message = require('./lib/message');
 var Registry = require('./lib/command-registry')();
 var fs      = require('fs');
+var q       = require('q');
 
 var txt = fs.readFileSync('./test/message.txt').toString();
 
@@ -18,10 +19,14 @@ Registry.register('log', function(args, m){
   console.log(m);
   return m;
 });
+Registry.register('log', function(args, m){
+  console.log(m.commands);
+  return m;
+});
 Registry.register('duplicate', function(args, m){
   var tmp = m.body;
 
-  for (var i = +args[0] || 0; i > 0; i --) {
+  for (var i = +args[0] || 1; i > 0; i --) {
     m.body += tmp;
   }
 
@@ -29,19 +34,32 @@ Registry.register('duplicate', function(args, m){
 });
 Registry.register('pause', function(args, m, done){
   setTimeout(function(){
-    console.log('calling');
     done(null, m);
   }, +args[0] || 0);
 });
 
 
-//Registry.call(a.commands, a, function(){
-//  console.log('Done.');
+Registry.call(a.commands, a, function(){
+  console.log('Done.');
+});
+
+///*
+//Works as expected
+// */
+//Registry.call(Command('#pause 2000'), a, function(err, data){
+//  console.log('done.1');
+//});
+//Registry.call(Command('#duplicate'), a, function(err, data){
+//  console.log('done.2');
 //});
 
-Registry.call(Command('#pause 2000'), a, function(err, data){
-  console.log('done.');
-});
+
+//Registry.call(Command('#pause 2000'), a).then(function () {
+//  return Registry.call(Command('#duplicate'), a, function(err, data){
+//    console.log('done.2');
+//  });
+//});
+
 
 //b.promise.done(function(){
 //  console.log(b);
