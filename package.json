@@ -4,7 +4,7 @@
   "description": "Perform tasks based on text from a given stream (hope to include email, twitter, and maybe even IM like jabber/irc/slack)",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./test",
+    "test": "mocha ./test/**/*.js",
     "lint": "eslint --cache **/*.js; exit 0"
   },
   "author": "Rhett Lowe <rng2ml@gmail.com>",
