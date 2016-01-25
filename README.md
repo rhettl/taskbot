@@ -12,23 +12,27 @@ express/connect style functions.
 
 - taskbot:
   - accepts:
-    - [ ] messages as text/plain
-    - [ ] messages as streams
-    - [ ] messages as buffers
+    - [x] messages as text/plain
+    - [x] messages as streams
+    - [x] messages as buffers
   - commands
-    - [ ] \# as inline command
+    - [x] \# as inline command
     - [ ] consider adding parsing via commander (somehow)
     - [ ] can accept list (considering similar to yaml list)
     - [ ] get sent through different parsers based on command name or regex
       - analogous with express routes
-    - [ ] are filtered out of text body automatically
+    - [x] are filtered out of text body automatically
       - [ ] make toggle for this in initialization object
   - parsers
-    - [ ] filters commands from text body
-    - [ ] each looks for commands
-    - [ ] parses commands through array of parsers
-    - [ ] each parser is triggered on a keyword/command
+    - [x] parses commands through array of parsers
+    - [x] each parser is triggered on a keyword/command
 
+#Additional Ideas
+
+- [ ] post message receive hook: If I am sending emails at *x* time, run task *y*
+- [ ] add headers to messages for things like webpages and emails
+- [ ] add some email parser from npm, I don't want to split and decode email bodies on my own
+- [ ] add html to txt email converter to prevent issues
 
 #Contributing
 

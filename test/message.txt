@@ -1,5 +1,7 @@
 #this is a command
 # this is also a command
+#duplicate 2
+#pause 2000
 #log
 #do something
 
