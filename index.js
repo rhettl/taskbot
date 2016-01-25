@@ -15,27 +15,27 @@ var a = Message(fs.readFileSync('./test/message.txt'));
 //var b = Message(fs.createReadStream('./test/message.txt'));
 //var c = Message(txt);
 
-Registry.register('log', function(args, m){
+Registry.register('log', function(cmd, m){
   console.log(m);
   return m;
 });
-Registry.register('log', function(args, m){
+Registry.register('log', function(cmd, m){
   console.log(m.commands);
   return m;
 });
-Registry.register('duplicate', function(args, m){
+Registry.register('duplicate', function(cmd, m){
   var tmp = m.body;
 
-  for (var i = +args[0] || 1; i > 0; i --) {
+  for (var i = +cmd.args[0] || 1; i > 0; i --) {
     m.body += tmp;
   }
 
   return m;
 });
-Registry.register('pause', function(args, m, done){
+Registry.register('pause', function(cmd, m, done){
   setTimeout(function(){
     done(null, m);
-  }, +args[0] || 0);
+  }, +cmd.args[0] || 0);
 });
 
 
