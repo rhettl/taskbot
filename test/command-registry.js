@@ -254,7 +254,8 @@ describe('CommandRegistry', function () {
     it('waits for first to finish before second starts', function (done) {
       var string    = '';
       var startTime = Date.now();
-      var delayTime = 200; // ms
+      var delayTime = 100; // ms
+      this.slow(3 * delayTime); // prevent "slow" message from appearing
       reg.register('done', function (_, __, cb) {
         string += 'one'; // run one
 
