@@ -5,10 +5,8 @@
 
 var Command = require('./lib/command');
 var Message = require('./lib/message');
-var Registry = require('./lib/command-registry')();
+var Registry = require('./lib/command-registry')(); // already initialized
 
-module.exports = {
-  Registry: Registry,
-  Message: Message,
-  Command: Command
-};
+module.exports = Registry;
+module.exports.Message = Message;
+module.exports.Command = Command;

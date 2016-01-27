@@ -1,10 +1,10 @@
 {
   "name": "taskbot",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Perform tasks based on text from a given stream (hope to include email, twitter, and maybe even IM like jabber/irc/slack)",
   "main": "index.js",
   "scripts": {
-    "prepublish": "npm run lint && npm test",
+    "prepublish": "npm run lint",
     "test": "mocha ./test/**/*.js",
     "lint": "eslint --cache **/*.js; exit 0"
   },
@@ -17,7 +17,8 @@
   "devDependencies": {
     "assert": "^1.3.0",
     "eslint": "^1.10.3",
-    "mocha": "^2.3.4"
+    "mocha": "^2.3.4",
+    "twitter": "^1.2.5"
   },
   "dependencies": {
     "q": "^1.4.1"
