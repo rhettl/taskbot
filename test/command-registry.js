@@ -4,16 +4,10 @@
 'use strict';
 
 var assert = require('assert');
-//var path   = require('path');
-//var fs     = require('fs');
 var q = require('q');
 
 var Registry = require('../lib/command-registry');
 var Command  = require('../lib/command');
-//var Message      = require('../lib/message');
-//var testFile     = './message.txt';
-//var testFilePath = path.normalize(path.join(__dirname, testFile));
-//var testMessage  = fs.readFileSync(testFilePath).toString();
 
 describe('CommandRegistry', function () {
 
