@@ -49,6 +49,21 @@ describe('Command', function () {
       assert.deepEqual(cmd1.args, cmd2.args);
     });
 
+    it('throws an error when provided with empty string/undefined', function () {
+      assert.throws(function () {
+        Command();
+      }, /invalid/);
+      assert.throws(function () {
+        Command('');
+      }, /invalid/i);
+    });
+
+    it('throws an error when provided with empty string/undefined', function () {
+      assert.throws(function () {
+        Command({length: 2}); // some object, not string or array, with length
+      }, /string.+array/i);
+    });
+
   });
 
   describe('#isCommand', function () {
