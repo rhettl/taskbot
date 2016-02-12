@@ -73,7 +73,7 @@ describe('Command', function () {
     });
 
     it('should not recognize a command without preceding #', function () {
-      assert.equal(false, Command.isCommand('now a command'));
+      assert.equal(false, Command.isCommand('not a command'));
     });
 
   });
@@ -81,7 +81,7 @@ describe('Command', function () {
   describe('#toString', function () {
 
     it('should produce a string', function () {
-      assert('string', Command('#command arg1 arg2').toString());
+      assert.equal('string', typeof Command('#command arg1 arg2').toString());
     });
 
     it('is not formatted like original command text', function () {

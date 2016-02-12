@@ -1,0 +1,10 @@
+#log
+#pause
+#log commands
+#Not all commands have to be named
+Body text can be anywhere
+#pause 1000
+#duplicate
+#log body
+
+This is the message body.
